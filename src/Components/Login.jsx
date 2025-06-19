@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Form, Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 const Login = () => {
   const [userData, setUserData] = useState({
     Username: "",
@@ -7,6 +9,8 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const controller = new AbortController();
 
   const loginForm = async (e) => {
     e.preventDefault();
@@ -30,7 +34,26 @@ const Login = () => {
       console.log(data);
 
       navigate("/main", { state: data }); // 🔁 go to dashboard on success
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+
+    // try {
+    //   const response = await axios.post(
+    //     "https://practice-vdup.onrender.com/login",
+    //     {
+    //       signal: controller.signal,
+    //     }
+    //   );
+    //   console.log(response.data);
+    //   // navigate("/main", { state: data });
+    // } catch (err) {
+    //   console.log(err);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (

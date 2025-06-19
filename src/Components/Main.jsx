@@ -2,15 +2,21 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Todo from "./Todo";
 import axios from "axios";
+// import jwtDecode  from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const Main = () => {
   const location = useLocation();
-  const { user_name, user_id } = location.state;
 
-  const [todos, setTodos] = useState({ user_id: user_id, Tasks: [] });
+  const { access_token } = location.state;
+  // const [user, setUser] = useState(null);
+  // const [todos, setTodos] = useState({ user_id: user_id, Tasks: [] });
   const [inputData, setInputData] = useState("");
   const [userTasks, setUserTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const decode = jwtDecode(access_token);
+  console.log(decode);
 
   const saveTask = async (e) => {
     // e.preventDefault();
@@ -22,7 +28,6 @@ const Main = () => {
     // Axios
     try {
       const payload = {
-        user_id,
         Tasks: [{ todo: inputData }],
       };
 
@@ -32,6 +37,7 @@ const Main = () => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
           },
         }
       );
@@ -42,12 +48,13 @@ const Main = () => {
 
       // Re-fetch tasks from backend to refresh UI
       const res = await axios.get(
-        `https://practice-vdup.onrender.com/Task/${user_id}`
+        `https://practice-vdup.onrender.com/Task/${decode.user_id}`
       );
       setUserTasks(res.data);
+      console.log(res.data);
     } catch (error) {
       console.error("Error saving task:", error);
-      alert("Failed to save task. Please check your internet connection.");
+      alert("Failed to save task.");
     }
   };
 
@@ -59,12 +66,12 @@ const Main = () => {
     try {
       await axios.put(
         `https://practice-vdup.onrender.com/Task/update_task/${taskId}`,
-        { user_id, todo: newContent } // Update this if your backend expects a different key
+        { todo: newContent } // Update this if your backend expects a different key
       );
 
       // Re-fetch tasks after successful update
       const res = await axios.get(
-        `https://practice-vdup.onrender.com/Task/${user_id}`
+        `https://practice-vdup.onrender.com/Task/${decode.user_id}`
       );
       setUserTasks(res.data);
 
@@ -78,13 +85,11 @@ const Main = () => {
   const deleteTask = async (taskId) => {
     try {
       await axios.delete(
-        `https://practice-vdup.onrender.com/Task/delete_task/${taskId}?user_id=${user_id}`
+        `https://practice-vdup.onrender.com/Task/delete_task/${taskId}?user_id=$`
       );
 
       // Re-fetch tasks after deletion
-      const res = await axios.get(
-        `https://practice-vdup.onrender.com/Task/${user_id}`
-      );
+      const res = await axios.get(`https://practice-vdup.onrender.com/Task/$`);
       setUserTasks(res.data);
 
       console.log("Task deleted successfully");
@@ -95,32 +100,37 @@ const Main = () => {
   };
 
   useEffect(() => {
-    if (!user_id) return;
-
+    let decoded_user_id = decode.user_id;
     const fetchTasks = async () => {
       try {
         const res = await axios.get(
-          `https://practice-vdup.onrender.com/Task/${user_id}`
+          `https://practice-vdup.onrender.com/Task/${decoded_user_id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
         );
         setUserTasks(res.data);
-      } catch (error) {
-        console.error("Failed to fetch tasks", error);
+      } catch (err) {
+        console.log(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchTasks();
-  }, [user_id]);
+  }, [access_token, decode.user_id]);
 
   let displayUserTasks = userTasks.tasks || [];
 
   if (loading) {
     return <p>Loading...</p>;
   }
+
   return (
     <div>
-      <h1>Welcome {user_name}</h1>
+      <h1>Welcome {decode.username}</h1>
       {/* <form action=""> */}
       <input
         type="text"
