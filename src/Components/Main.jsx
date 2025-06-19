@@ -9,8 +9,6 @@ const Main = () => {
   const location = useLocation();
 
   const { access_token } = location.state;
-  // const [user, setUser] = useState(null);
-  // const [todos, setTodos] = useState({ user_id: user_id, Tasks: [] });
   const [inputData, setInputData] = useState("");
   const [userTasks, setUserTasks] = useState([]);
   const [loading, setLoading] = useState(true);
