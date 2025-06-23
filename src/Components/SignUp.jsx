@@ -48,7 +48,6 @@ const SignUp = () => {
         userData
       );
 
-      console.log("Signup successful:", response.data);
       // Redirect or notify user
       alert("Sign up Successful");
       navigate("/login");

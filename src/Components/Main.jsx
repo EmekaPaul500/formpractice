@@ -13,7 +13,6 @@ const Main = () => {
   const [loading, setLoading] = useState(true);
 
   const decode = jwtDecode(access_token);
-  console.log(decode);
 
   const saveTask = async (e) => {
     // e.preventDefault();
@@ -52,7 +51,6 @@ const Main = () => {
         }
       );
       setUserTasks(res.data);
-      console.log(res.data);
     } catch (error) {
       console.error("Error saving task:", error);
       alert("Failed to save task.");
@@ -87,8 +85,6 @@ const Main = () => {
         }
       );
       setUserTasks(res.data);
-
-      console.log("Task updated successfully");
     } catch (error) {
       console.error("Failed to update task:", error);
       alert("Failed to update task. Please try again.");
@@ -141,7 +137,6 @@ const Main = () => {
         );
         setUserTasks(res.data);
       } catch (err) {
-        console.log(err);
       } finally {
         setLoading(false);
       }
