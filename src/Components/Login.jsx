@@ -10,8 +10,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const controller = new AbortController();
-
   const loginForm = async (e) => {
     e.preventDefault();
     setLoading(true);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Link } from "react-router-dom";
+import { data, Form, Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const SignUp = () => {
@@ -47,10 +47,11 @@ const SignUp = () => {
         "https://practice-vdup.onrender.com/signup",
         userData
       );
+
       console.log("Signup successful:", response.data);
       // Redirect or notify user
+      alert("Sign up Successful");
       navigate("/login");
-      alert("Sign up Sucessful");
     } catch (err) {
       if (!err.response) {
         // No response from server = likely network error

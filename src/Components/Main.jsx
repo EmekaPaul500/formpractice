@@ -7,7 +7,6 @@ import { jwtDecode } from "jwt-decode";
 
 const Main = () => {
   const location = useLocation();
-
   const { access_token } = location.state;
   const [inputData, setInputData] = useState("");
   const [userTasks, setUserTasks] = useState([]);
@@ -29,7 +28,7 @@ const Main = () => {
         Tasks: [{ todo: inputData }],
       };
 
-      const response = await axios.post(
+      await axios.post(
         "https://practice-vdup.onrender.com/Task/add_task",
         payload,
         {
@@ -40,13 +39,17 @@ const Main = () => {
         }
       );
 
-      console.log("Task saved:", response.data);
-
       setInputData(""); // Clear input field
 
       // Re-fetch tasks from backend to refresh UI
       const res = await axios.get(
-        `https://practice-vdup.onrender.com/Task/${decode.user_id}`
+        `https://practice-vdup.onrender.com/Task/${decode.user_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
       );
       setUserTasks(res.data);
       console.log(res.data);
@@ -64,12 +67,24 @@ const Main = () => {
     try {
       await axios.put(
         `https://practice-vdup.onrender.com/Task/update_task/${taskId}`,
-        { todo: newContent } // Update this if your backend expects a different key
+        { todo: newContent },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
       );
 
       // Re-fetch tasks after successful update
       const res = await axios.get(
-        `https://practice-vdup.onrender.com/Task/${decode.user_id}`
+        `https://practice-vdup.onrender.com/Task/${decode.user_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
       );
       setUserTasks(res.data);
 
@@ -83,14 +98,28 @@ const Main = () => {
   const deleteTask = async (taskId) => {
     try {
       await axios.delete(
-        `https://practice-vdup.onrender.com/Task/delete_task/${taskId}?user_id=$`
+        `https://practice-vdup.onrender.com/Task/delete_task/${taskId}?user_id= ${decode.user_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
       );
 
       // Re-fetch tasks after deletion
-      const res = await axios.get(`https://practice-vdup.onrender.com/Task/$`);
+      const res = await axios.get(
+        `https://practice-vdup.onrender.com/Task/${decode.user_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
       setUserTasks(res.data);
 
-      console.log("Task deleted successfully");
+      alert("Task deleted successfully");
     } catch (error) {
       console.error("Failed to delete task:", error);
       alert("Failed to delete task. Please try again.");
